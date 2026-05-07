@@ -6,6 +6,16 @@ interface ISignUpDTO {
   password: string;
 }
 
+interface ISignInDTO {
+  email: string;
+  password: string;
+}
+
+interface ISignInResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
 export class AuthService {
   static async signUp({ name, email, password }: ISignUpDTO) {
     const { data } = await HttpClient.post('/signup', {
@@ -13,6 +23,12 @@ export class AuthService {
       email,
       password,
     });
+
+    return data;
+  }
+
+  static async signIn({ email, password }: ISignInDTO) {
+    const { data } = await HttpClient.post<ISignInResponse>('/signin', { email, password });
 
     return data;
   }
