@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { AuthService } from '@/services/AuthService';
+import { useAuth } from '@/hooks/useAuth';
 import { useForm } from 'react-hook-form';
 
 interface IFormData {
@@ -10,6 +10,8 @@ interface IFormData {
 }
 
 export function SignIn() {
+  const { signIn } = useAuth();
+
   const form = useForm<IFormData>({
     defaultValues: {
       email: '',
@@ -18,9 +20,11 @@ export function SignIn() {
   });
 
   const handleSubmit = form.handleSubmit(async ({ email, password }) => {
-    const { accessToken, refreshToken } = await AuthService.signIn({ email, password });
-
-    console.log('Sign in data:', { accessToken, refreshToken });
+    try {
+      await signIn(email, password);
+    } catch {
+      console.error('Credenciais inválidas.');
+    }
   });
 
   return (
@@ -38,7 +42,10 @@ export function SignIn() {
           <Input id="password" type="password" {...form.register('password')} />
         </div>
 
-        <Button className="mt-3">Entrar</Button>
+        <Button className="mt-3" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting && 'Entrando...'}
+          {!form.formState.isSubmitting && 'Entrar'}
+        </Button>
       </form>
     </div>
   );
