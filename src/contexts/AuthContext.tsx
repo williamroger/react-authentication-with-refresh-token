@@ -1,4 +1,4 @@
-import { createContext, useCallback, useState } from "react";
+import { createContext, useCallback, useState } from 'react';
 import { AuthService } from '@/services/AuthService';
 
 interface IAuthContextValue {
@@ -9,15 +9,18 @@ interface IAuthContextValue {
 export const AuthContext = createContext({} as IAuthContextValue);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [signedIn, setSignedIn] = useState(false);
+  const [signedIn, setSignedIn] = useState(() => {
+    return Boolean(localStorage.getItem('live19:accessToken'));
+  });
 
   const signIn = useCallback(async (email: string, password: string) => {
     const { accessToken, refreshToken } = await AuthService.signIn({
       email,
-      password
+      password,
     });
 
-    console.log('Sign in data:', { accessToken, refreshToken });
+    localStorage.setItem('live19:accessToken', accessToken);
+    localStorage.setItem('live19:refreshToken', refreshToken);
 
     setSignedIn(true);
   }, []);
@@ -27,9 +30,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
