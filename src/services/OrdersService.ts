@@ -1,6 +1,5 @@
 import { IOrder } from '@/entities/IOrder';
 import { HttpClient } from './HttpClient';
-import { StorageKeys } from '@/configs/StorageKeys';
 
 export class OrdersService {
   static async getOrders() {
